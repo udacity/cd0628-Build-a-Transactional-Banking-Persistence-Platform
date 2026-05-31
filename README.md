@@ -1,55 +1,27 @@
-# README Template
+# Transactional Banking Persistence Platform
 
-Below is a template provided for use when building your README file for students.
+This repository contains the starter project for Course 2: Data Persistence with Hibernate and JPA (cd0628), part of the Udacity Java backend nanodegree.
 
-# Project Title
+## Repository Layout
 
-Project description goes here.
+The project skeleton lives in the `starter/` folder. Top-level files include `LICENSE.txt`, `CODEOWNERS`, and this README.
 
 ## Getting Started
 
-Instructions for how to get a copy of the project running on your local machine.
+All project instructions, prerequisites, exercises, and acceptance criteria are inside the `starter/` folder:
 
-### Dependencies
-
-```
-Examples here
-```
-
-### Installation
-
-Step by step explanation of how to get a dev environment running.
-
-List out the steps
-
-```
-Give an example here
-```
-
-## Testing
-
-Explain the steps needed to run any automated tests
-
-### Break Down Tests
-
-Explain what each test does and why
-
-```
-Examples here
-```
-
-## Project Instructions
-
-This section should contain all the student deliverables for this project.
+1. `cd starter`
+2. Open `starter/README.md` for the full project guide
 
 ## Built With
 
-* [Item1](www.item1.com) - Description of item
-* [Item2](www.item2.com) - Description of item
-* [Item3](www.item3.com) - Description of item
-
-Include all items used to build project.
+- Spring Boot 4 — application framework
+- Hibernate ORM 7 — JPA provider
+- PostgreSQL 17 — relational database
+- Flyway — database migrations
+- Maven (via wrapper) — build tool
+- JUnit 5 — testing framework
 
 ## License
 
-[License](LICENSE.txt)
+See `LICENSE.txt`.
