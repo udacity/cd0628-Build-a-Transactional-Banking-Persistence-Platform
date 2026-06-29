@@ -6,7 +6,7 @@ In this project you will build the **persistence layer** of a small banking plat
 
 A learner who finishes this project will have hands-on experience with the persistence patterns that real-world Java backend engineers use every day.
 
-**Estimated time to complete: 4–6 hours.**
+**Estimated time to complete: 4-6 hours.**
 
 ## Learning Objectives
 
@@ -23,9 +23,11 @@ By the end of this project you will be able to:
 ## Prerequisites
 
 - **JDK 25** (Temurin recommended)
-- **Docker Desktop** (for PostgreSQL 17)
 - **Git**
 - An editor with Java support (VS Code with Java extensions, IntelliJ IDEA, or Eclipse)
+- One of:
+  - **Docker Desktop** (for local PostgreSQL 17 via docker-compose), or
+  - The Udacity workspace (PostgreSQL 17 is pre-installed)
 
 ## Getting Started
 
@@ -36,13 +38,27 @@ git clone <this-repo-url>
 cd cd0628-Build-a-Transactional-Banking-Persistence-Platform/starter
 ```
 
-### 2. Start PostgreSQL
+### 2. Set up PostgreSQL
+
+Pick the path that matches your environment.
+
+**Option A: Local development with Docker**
 
 ```bash
 docker compose up -d
 ```
 
 This launches PostgreSQL 17 on port `5432` with database `banking`, user `banking`, password `banking`. Flyway will auto-create the schema on first run.
+
+**Option B: Udacity workspace**
+
+The workspace already has PostgreSQL 17 running. Run the one-time setup script from the `starter/` directory to create the `banking` role and database:
+
+```bash
+bash setup/setup-postgres.sh
+```
+
+The script is idempotent, so re-running it is safe. See `setup/SETUP.md` for details.
 
 ### 3. Verify the starter compiles
 
@@ -53,7 +69,7 @@ This launches PostgreSQL 17 on port `5432` with database `banking`, user `bankin
 
 You should see `BUILD SUCCESS`.
 
-### 4. Run the tests — they should mostly FAIL
+### 4. Run the tests - they should mostly FAIL
 
 ```bash
 ./mvnw test
@@ -67,33 +83,33 @@ You will fill in the `TODO` markers in these files (in roughly this order):
 
 ### Repositories (define the query methods)
 
-1. **`AccountRepository.java`** — derived methods, JPQL `@Query`, JOIN FETCH, constructor projection, and `@Lock(PESSIMISTIC_WRITE)`. The class Javadoc lists the 8 methods to define.
+1. **`AccountRepository.java`** - derived methods, JPQL `@Query`, JOIN FETCH, constructor projection, and `@Lock(PESSIMISTIC_WRITE)`. The class Javadoc lists the 8 methods to define.
 
-2. **`CustomerRepository.java`** — two finders that demonstrate `JOIN FETCH` and `@EntityGraph`.
+2. **`CustomerRepository.java`** - two finders that demonstrate `JOIN FETCH` and `@EntityGraph`.
 
-3. **`TransactionRepository.java`** — keyset pagination and a native query that returns `MonthlyReport` DTO rows.
+3. **`TransactionRepository.java`** - keyset pagination and a native query that returns `MonthlyReport` DTO rows.
 
-4. **`AccountSpecs.java`** — four `Specification<Transaction>` builders used by the dynamic search service.
+4. **`AccountSpecs.java`** - four `Specification<Transaction>` builders used by the dynamic search service.
 
 ### Services (implement the transactional behavior)
 
-5. **`DepositService.java`** — atomic balance update + transaction row insert.
+5. **`DepositService.java`** - atomic balance update + transaction row insert.
 
-6. **`WithdrawalService.java`** — atomic update with insufficient-funds rollback.
+6. **`WithdrawalService.java`** - atomic update with insufficient-funds rollback.
 
-7. **`TransferService.java`** — multi-account transaction with audit log call.
+7. **`TransferService.java`** - multi-account transaction with audit log call.
 
-8. **`AuditLogService.java`** — `Propagation.REQUIRES_NEW` to commit audit independently.
+8. **`AuditLogService.java`** - `Propagation.REQUIRES_NEW` to commit audit independently.
 
-9. **`OptimisticLockingDemoService.java`** — reproduce a lost-update conflict using `@Version`.
+9. **`OptimisticLockingDemoService.java`** - reproduce a lost-update conflict using `@Version`.
 
-10. **`AccountUpdateWorker.java`** + **`PessimisticLockingDemoService.java`** — two-thread demo with `SELECT ... FOR UPDATE` locking.
+10. **`AccountUpdateWorker.java`** + **`PessimisticLockingDemoService.java`** - two-thread demo with `SELECT ... FOR UPDATE` locking.
 
-11. **`NPlusOneDemoService.java`** — three loaders showing default + `@BatchSize`, `JOIN FETCH`, and `@EntityGraph` approaches.
+11. **`NPlusOneDemoService.java`** - three loaders showing default + `@BatchSize`, `JOIN FETCH`, and `@EntityGraph` approaches.
 
-12. **`TransactionSearchService.java`** — compose specifications conditionally.
+12. **`TransactionSearchService.java`** - compose specifications conditionally.
 
-13. **`MonthlyReportService.java`** — call the native query and return the DTO list.
+13. **`MonthlyReportService.java`** - call the native query and return the DTO list.
 
 Each file has class-level and method-level Javadoc explaining what to implement and why. The hints reference specific Hibernate/Spring annotations and patterns from the course content.
 
@@ -101,7 +117,9 @@ Each file has class-level and method-level Javadoc explaining what to implement 
 
 Run `./mvnw test` after each change. Your goal is:
 
+```
 Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+```
 
 The tests are deliberately structured so that:
 
@@ -125,29 +143,29 @@ A complete submission satisfies all of the following:
 | 3 | `AccountRepository` defines all 8 methods with appropriate annotations |
 | 4 | `CustomerRepository` has both `findAllWithJoinFetch` (JPQL) and `findAllWithEntityGraph` (`@EntityGraph`) |
 | 5 | `TransactionRepository` has keyset-pagination method AND a native-query method for the monthly report |
-| 6 | All four service-layer write methods (deposit, withdrawal, transfer, audit) use `@Transactional` correctly — including `REQUIRES_NEW` on audit |
+| 6 | All four service-layer write methods (deposit, withdrawal, transfer, audit) use `@Transactional` correctly - including `REQUIRES_NEW` on audit |
 | 7 | `OptimisticLockingDemoService` detaches the first entity before loading the second, and triggers `OptimisticLockingFailureException` |
 | 8 | `AccountUpdateWorker.addBalanceWithLock` calls `findByIdForUpdate` and is `@Transactional` |
 | 9 | `AccountSpecs` builders correctly use `CriteriaBuilder` to construct predicates |
 
 ## Troubleshooting
 
-- **`Connection refused` to Postgres** → `docker compose ps` to check the container is up; `docker compose logs db` to inspect.
-- **`LazyInitializationException: could not initialize proxy`** → you're accessing a lazy collection outside a transaction. Add `@Transactional` to the method, or use `JOIN FETCH` / `@EntityGraph`.
-- **`No active transaction` on a pessimistic lock query** → the method must be `@Transactional` AND called through the Spring proxy (not via self-invocation). This is why `AccountUpdateWorker` is a separate bean.
-- **`OptimisticLockingFailureException` not thrown in the demo** → you forgot `entityManager.detach(clientA)` before loading Client B. Without detach, Hibernate's first-level cache returns the same instance both times.
+- **`Connection refused` to Postgres** -> if using Docker, `docker compose ps` to check the container is up; `docker compose logs` to inspect. If in the Udacity workspace, ensure you ran `bash setup/setup-postgres.sh` and the workspace's Postgres service is running.
+- **`role "banking" does not exist`** or **`database "banking" does not exist`** -> in the Udacity workspace, re-run `bash setup/setup-postgres.sh`.
+- **`LazyInitializationException: could not initialize proxy`** -> you're accessing a lazy collection outside a transaction. Add `@Transactional` to the method, or use `JOIN FETCH` / `@EntityGraph`.
+- **`No active transaction` on a pessimistic lock query** -> the method must be `@Transactional` AND called through the Spring proxy (not via self-invocation). This is why `AccountUpdateWorker` is a separate bean.
+- **`OptimisticLockingFailureException` not thrown in the demo** -> you forgot `entityManager.detach(clientA)` before loading Client B. Without detach, Hibernate's first-level cache returns the same instance both times.
 
 ## Built With
 
-- **Spring Boot 4.0.6** — application framework
-- **Hibernate ORM 7.2** — JPA provider
-- **PostgreSQL 17** — relational database
-- **Flyway** — database migrations
-- **Maven** (via wrapper) — build tool
-- **JUnit 5** — testing framework
-- **Docker Compose** — local Postgres orchestration
+- **Spring Boot 4.0.6** - application framework
+- **Hibernate ORM 7.2** - JPA provider
+- **PostgreSQL 17** - relational database
+- **Flyway** - database migrations
+- **Maven** (via wrapper) - build tool
+- **JUnit 5** - testing framework
+- **Docker Compose** - local Postgres orchestration (optional)
 
 ## License
 
 See `LICENSE.txt` in the repository root.
-
