@@ -21,8 +21,11 @@ import com.udacity.banking.entity.Money;
  *      Use @Query with JPQL JOIN on Customer to filter by email.
  *
  *   2. getTotalBalanceForCustomer(Long customerId) -> BigDecimal
- *      Use @Query JPQL — SUM(a.balance.amount) WHERE customer.id = :customerId
- *
+ *      Use @Query JPQL: SUM(a.balance) WHERE customer.id = :customerId
+ *      Money is mapped through MoneyConverter, not @Embeddable, so there is
+ *      no .amount path to navigate. Consider COALESCE so a customer with no
+ *      accounts returns 0 rather than null.
+ * 
  *   3. findByIdWithCustomer(Long id) -> Optional<Account>
  *      Use @Query with JOIN FETCH so the customer is loaded eagerly in one query.
  *
@@ -30,7 +33,7 @@ import com.udacity.banking.entity.Money;
  *      Derived method (no @Query needed — Spring generates from the name).
  *
  *   5. findByBalanceGreaterThan(Money money) -> List<Account>
- *      Derived method using the embedded Money attribute.
+ *      Derived method using the converted Money attribute.
  *
  *   6. countByCustomer_Id(Long customerId) -> Long
  *      Derived method using nested traversal.
